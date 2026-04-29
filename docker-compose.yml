@@ -1,0 +1,220 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - Primary structured system of record
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: fullstackarkham-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fullstackarkham
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # PostGIS extension for BIM spatial data
+  postgis:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: fullstackarkham-postgis
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fullstackarkham_bim
+    ports:
+      - "15433:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    depends_on:
+      - postgres
+
+  # Redis - Operational state and high-speed control data
+  redis:
+    image: redis:7-alpine
+    container_name: fullstackarkham-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "16379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis for rate limiting and queues (separate instance)
+  redis-queues:
+    image: redis:7-alpine
+    container_name: fullstackarkham-redis-queues
+    command: redis-server --appendonly yes
+    ports:
+      - "16380:6379"
+    volumes:
+      - redis_queues_data:/data
+
+  # Gateway service
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-gateway
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=fullstackarkham
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - ARKHAM_ENABLED=true
+      - ARKHAM_ENDPOINT=http://arkham:8081
+      - JWT_SECRET=dev-secret-change-in-production
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/gateway:/app
+
+  # Arkham Security service (Python - from arkham repo)
+  arkham:
+    build:
+      context: ./services/arkham
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-arkham
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fullstackarkham
+      - REDIS_URL=redis://redis:6379/0
+      - DECEPTION_ENABLED=true
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - redis
+
+  # BIM Ingestion service
+  bim_ingestion:
+    build:
+      context: ./services/bim_ingestion
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-bim-ingestion
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgis:5432/fullstackarkham_bim
+      - REDIS_URL=redis://redis-queues:6379/0
+      - STORAGE_PATH=/data/bim
+    ports:
+      - "8082:8082"
+    volumes:
+      - bim_data:/data/bim
+    depends_on:
+      - postgis
+      - redis-queues
+
+  # Orchestration service
+  orchestration:
+    build:
+      context: ./services/orchestration
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-orchestration
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fullstackarkham
+      - REDIS_URL=redis://redis-queues:6379/0
+      - GATEWAY_URL=http://gateway:8080
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+      - redis-queues
+      - gateway
+
+  # Semantic Cache service
+  semantic-cache:
+    build:
+      context: ./services/semantic-cache
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-semantic-cache
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fullstackarkham
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+      - redis
+
+  # Memory service (A-MEM)
+  memory:
+    build:
+      context: ./services/memory
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-memory
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fullstackarkham
+      - REDIS_URL=redis://redis:6379/0
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres
+      - redis
+
+  # Billing service
+  billing:
+    build:
+      context: ./services/billing
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-billing
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fullstackarkham
+      - STRIPE_SECRET_KEY=STRIPE_TEST_KEY_PLACEHOLDER
+      - STRIPE_WEBHOOK_SECRET=WEBHOOK_SECRET_PLACEHOLDER
+    ports:
+      - "8086:8086"
+    depends_on:
+      - postgres
+
+  # Papabase - Family Studio Suite (AI website generation + CRM)
+  papabase:
+    build:
+      context: ./services/papabase
+      dockerfile: Dockerfile
+    container_name: fullstackarkham-papabase
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8087
+      - GATEWAY_URL=http://gateway:8080
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fullstackarkham
+      - REDIS_URL=redis://redis:6379/0
+      - LOG_LEVEL=info
+    ports:
+      - "8087:8087"
+    depends_on:
+      - gateway
+      - postgres
+      - redis
+    volumes:
+      - papabase_data:/data
+
+volumes:
+  postgres_data:
+  postgis_data:
+  redis_data:
+  redis_queues_data:
+  bim_data:
+  papabase_data:
+
+networks:
+  default:
+    name: fullstackarkham-network

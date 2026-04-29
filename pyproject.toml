@@ -1,0 +1,13 @@
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q -v --tb=short"
+testpaths = ["tests", "services"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+markers = [
+    "e2e: end-to-end integration tests",
+    "slow: slow running tests",
+    "requires_docker: tests that require docker services",
+]

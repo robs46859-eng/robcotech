@@ -1,0 +1,38 @@
+============================================
+Papabase Azure Deployment Complete!
+============================================
+Date: Tue Apr 28 15:54:32 MDT 2026
+
+Resource Group: papabase-rg-2
+Location: westus
+
+API URL: https://papabase-api.redmushroom-ed7ab088.westus.azurecontainerapps.io
+Gateway URL: https://gateway.redmushroom-ed7ab088.westus.azurecontainerapps.io
+
+Database:
+- Host: papabase-psql.postgres.database.azure.com
+- User: papabase
+- Password: DB_PASSWORD_REDACTED
+
+Redis:
+- Host: papabase-redis.redis.cache.windows.net
+- Port: 6379
+- Password: REDIS_KEY_REDACTED
+
+Stripe Configuration:
+- Secret Key: sk_live_REDACTED
+- Webhook Secret: whsec_REDACTED
+- Webhook URL: https://papabase-api.redmushroom-ed7ab088.westus.azurecontainerapps.io/api/v1/billing/webhook
+
+DNS Configuration:
+Type: CNAME
+Name: api
+Value: papabase-api.redmushroom-ed7ab088.westus.azurecontainerapps.io
+
+Next Steps:
+1. Test: curl https://papabase-api.redmushroom-ed7ab088.westus.azurecontainerapps.io/health
+2. Configure DNS for fsai.pro
+3. Set up Stripe webhook
+4. Deploy frontend
+
+============================================

@@ -1,0 +1,9 @@
+# FullStackArkham Kubernetes Deployment
+
+## Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fullstackarkham
+  labels:
+    name: fullstackarkham

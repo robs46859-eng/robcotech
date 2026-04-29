@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3DC2B9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #316844;
+}
+
+/* Gradient backgrounds */
+.gradient-pink {
+  background: linear-gradient(135deg, #EC89A3 0%, #F9B8C8 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #316844 0%, #4A8B64 100%);
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #3DC2B9 0%, #6FD9D1 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #643277 0%, #8B5A9E 100%);
+}
+
+.gradient-main {
+  background: linear-gradient(135deg, #643277 0%, #EC89A3 50%, #3DC2B9 100%);
+}

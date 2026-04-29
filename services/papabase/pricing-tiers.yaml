@@ -1,0 +1,335 @@
+# Papabase Pricing Tiers Configuration
+# This file defines the SaaS pricing model for Papabase
+
+---
+# Pricing Philosophy:
+# - Starter: Entry point for solo operators ($29/mo) - competes with Carrd/Squarespace
+# - Studio: Small teams ($99/mo) - full CRM + multi-page sites
+# - Agency: Growing businesses ($299/mo) - unlimited AI + white-label + dashboards
+# - Enterprise: Custom pricing - dedicated infra, SSO, on-prem
+
+pricing:
+  starter:
+    id: starter
+    name: "Starter"
+    tagline: "For solo operators and side hustles"
+    pricing:
+      monthly: 29
+      yearly: 290  # ~2 months free
+      currency: USD
+    
+    limits:
+      seats: 1
+      ai_generations_per_month: 3
+      storage_gb: 1
+      api_calls_per_day: 100
+      custom_domains: 0
+      email_sends_per_month: 100
+    
+    output_types:
+      - single_page
+    
+    features:
+      - "Single-page HTML websites"
+      - "Responsive design"
+      - "SEO optimized"
+      - "Basic CRM (leads & tasks)"
+      - "Contact forms"
+      - "Mobile optimized"
+      - "Community support"
+    
+    dad_ai_capabilities:
+      max_pages: 1
+      templates:
+        - landing-page
+        - portfolio-single
+        - service-card
+      integrations: []
+      analytics: basic
+    
+    support:
+      level: community
+      channels:
+        - documentation
+        - community_forum
+      response_time: best_effort
+
+  studio:
+    id: studio
+    name: "Studio"
+    tagline: "For small studios (2-5 people)"
+    pricing:
+      monthly: 99
+      yearly: 990  # ~2 months free
+      currency: USD
+    
+    limits:
+      seats: 5
+      ai_generations_per_month: 15
+      storage_gb: 10
+      api_calls_per_day: 1000
+      custom_domains: 3
+      email_sends_per_month: 5000
+    
+    output_types:
+      - single_page
+      - multi_page
+    
+    features:
+      - "Everything in Starter, plus:"
+      - "Multi-page React websites"
+      - "Full CRM with workflows"
+      - "Lead → Quote → Invoice pipeline"
+      - "Email automation"
+      - "Custom domain (up to 3)"
+      - "Analytics dashboard"
+      - "Blog integration"
+      - "Booking system"
+      - "Priority support"
+    
+    dad_ai_capabilities:
+      max_pages: 10
+      templates:
+        - landing-page
+        - business-site
+        - portfolio
+        - restaurant
+        - professional-services
+      integrations:
+        - stripe
+        - calendly
+        - mailchimp
+      analytics: advanced
+      seo_tools: true
+    
+    support:
+      level: priority
+      channels:
+        - documentation
+        - email
+        - chat
+      response_time: 24_hours
+
+  agency:
+    id: agency
+    name: "Agency"
+    tagline: "For growing agencies (6-20 people)"
+    pricing:
+      monthly: 299
+      yearly: 2990  # ~2 months free
+      currency: USD
+    
+    limits:
+      seats: 20
+      ai_generations_per_month: -1  # unlimited
+      storage_gb: 100
+      api_calls_per_day: 10000
+      custom_domains: -1  # unlimited
+      email_sends_per_month: 50000
+    
+    output_types:
+      - single_page
+      - multi_page
+      - dashboard
+    
+    features:
+      - "Everything in Studio, plus:"
+      - "Full web applications"
+      - "Multi-user dashboards"
+      - "Client portals"
+      - "Payment integration"
+      - "API access"
+      - "White-label option"
+      - "Custom integrations"
+      - "SLA guarantee"
+      - "Dedicated support"
+      - "Priority feature requests"
+    
+    dad_ai_capabilities:
+      max_pages: -1  # unlimited
+      templates:
+        - all
+      integrations:
+        - stripe
+        - calendly
+        - mailchimp
+        - salesforce
+        - hubspot
+        - zapier
+        - slack
+      analytics: full
+      seo_tools: true
+      ab_testing: true
+      custom_code: true
+    
+    support:
+      level: dedicated
+      channels:
+        - documentation
+        - email
+        - chat
+        - phone
+        - slack_channel
+      response_time: 4_hours
+      sla: 99.9
+
+  enterprise:
+    id: enterprise
+    name: "Enterprise"
+    tagline: "For large teams with custom needs"
+    pricing:
+      monthly: 0  # custom pricing
+      yearly: 0
+      currency: USD
+      note: "Contact sales for custom pricing"
+    
+    limits:
+      seats: -1  # unlimited
+      ai_generations_per_month: -1
+      storage_gb: -1
+      api_calls_per_day: -1
+      custom_domains: -1
+      email_sends_per_month: -1
+    
+    output_types:
+      - single_page
+      - multi_page
+      - dashboard
+      - custom
+    
+    features:
+      - "Everything in Agency, plus:"
+      - "Unlimited seats"
+      - "Dedicated infrastructure"
+      - "SSO/SAML integration"
+      - "On-premise option"
+      - "Custom development"
+      - "24/7 phone support"
+      - "Custom contracts"
+      - "Training sessions"
+      - "Dedicated account manager"
+    
+    dad_ai_capabilities:
+      max_pages: -1
+      templates:
+        - all
+        - custom
+      integrations:
+        - all
+        - custom
+      analytics: full
+      custom_models: true
+      fine_tuning: true
+      dedicated_capacity: true
+    
+    support:
+      level: 24/7
+      channels:
+        - all
+        - dedicated_slack
+        - dedicated_phone
+      response_time: 1_hour
+      sla: 99.99
+      dedicated_manager: true
+
+# Add-ons (available for all tiers)
+addons:
+  extra_seats:
+    name: "Additional Seats"
+    price_per_seat: 15
+    currency: USD
+    billing: monthly
+  
+  extra_ai_generations:
+    name: "Extra AI Generations"
+    price_per_10: 10
+    currency: USD
+    billing: monthly
+  
+  extra_storage:
+    name: "Extra Storage"
+    price_per_10gb: 5
+    currency: USD
+    billing: monthly
+  
+  white_label:
+    name: "White Label"
+    price: 99
+    currency: USD
+    billing: monthly
+    available_for:
+      - agency
+      - enterprise
+  
+  priority_support:
+    name: "Priority Support"
+    price: 49
+    currency: USD
+    billing: monthly
+    available_for:
+      - starter
+      - studio
+
+# Feature comparison matrix for marketing
+comparison_matrix:
+  headers:
+    - Feature
+    - Starter
+    - Studio
+    - Agency
+    - Enterprise
+  
+  rows:
+    - feature: "Price (monthly)"
+      starter: "$29"
+      studio: "$99"
+      agency: "$299"
+      enterprise: "Custom"
+    
+    - feature: "Seats included"
+      starter: "1"
+      studio: "5"
+      agency: "20"
+      enterprise: "Unlimited"
+    
+    - feature: "AI website generations"
+      starter: "3/mo"
+      studio: "15/mo"
+      agency: "Unlimited"
+      enterprise: "Unlimited"
+    
+    - feature: "Output types"
+      starter: "Single page"
+      studio: "Multi-page"
+      agency: "Dashboards"
+      enterprise: "Custom"
+    
+    - feature: "CRM"
+      starter: "Basic"
+      studio: "Full"
+      agency: "Full + workflows"
+      enterprise: "Custom"
+    
+    - feature: "Custom domains"
+      starter: "—"
+      studio: "3"
+      agency: "Unlimited"
+      enterprise: "Unlimited"
+    
+    - feature: "White label"
+      starter: "—"
+      studio: "—"
+      agency: "✓"
+      enterprise: "✓"
+    
+    - feature: "API access"
+      starter: "—"
+      studio: "—"
+      agency: "✓"
+      enterprise: "✓"
+    
+    - feature: "Support"
+      starter: "Community"
+      studio: "Priority"
+      agency: "Dedicated"
+      enterprise: "24/7"
